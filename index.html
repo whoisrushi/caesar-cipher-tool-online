@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caesar Cipher Tool</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #2a4365);
+            color: #f0f0f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .panel {
+            background: rgba(30, 40, 80, 0.7);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4a9fe3;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .control-group {
+            margin-bottom: 20px;
+        }
+        
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 150px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #4a9fe3;
+            border-radius: 5px;
+            padding: 15px;
+            color: #fff;
+            font-size: 1rem;
+            resize: vertical;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #6bb9f0;
+            box-shadow: 0 0 0 2px rgba(74, 159, 227, 0.3);
+        }
+        
+        .shift-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .shift-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        button {
+            background: linear-gradient(to right, #4a9fe3, #5d7cec);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        button:hover {
+            background: linear-gradient(to right, #5d7cec, #4a9fe3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #4CAF50, #2E8B57);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, #f39c12, #e67e22);
+        }
+        
+        .btn-reset {
+            background: linear-gradient(to right, #e74c3c, #c0392b);
+        }
+        
+        .frequency-section {
+            margin-top: 30px;
+        }
+        
+        .frequency-bars {
+            display: flex;
+            height: 150px;
+            align-items: flex-end;
+            gap: 2px;
+            margin-top: 15px;
+        }
+        
+        .frequency-bar {
+            flex: 1;
+            background: linear-gradient(to top, #4a9fe3, #5d7cec);
+            position: relative;
+            min-width: 10px;
+            border-radius: 3px 3px 0 0;
+        }
+        
+        .frequency-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+        
+        .auto-decrypt {
+            grid-column: 1 / -1;
+        }
+        
+        .results-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .decrypt-result {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+        
+        .decrypt-result:hover {
+            background: rgba(74, 159, 227, 0.2);
+            border-color: #4a9fe3;
+        }
+        
+        .decrypt-result.selected {
+            background: rgba(46, 204, 113, 0.2);
+            border-color: #2ecc71;
+        }
+        
+        .shift-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #4a9fe3;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        .instructions {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .instructions h3 {
+            color: #4a9fe3;
+            margin-bottom: 10px;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Caesar Cipher Tool</h1>
+            <p class="subtitle">Encrypt, decrypt, and analyze text using the Caesar cipher method. Shift letters by any value to encode or decode messages.</p>
+        </header>
+        
+        <div class="instructions">
+            <h3>How to Use:</h3>
+            <ul>
+                <li><strong>Encrypt:</strong> Enter text, set shift value, click Encrypt</li>
+                <li><strong>Decrypt:</strong> Enter ciphertext, set shift value, click Decrypt</li>
+                <li><strong>Auto Decrypt:</strong> Click "Auto Decrypt" to try all 25 possible shifts</li>
+                <li><strong>Frequency Analysis:</strong> Visualizes letter distribution in your text</li>
+                <li><strong>Select Result:</strong> Click on any auto-decrypt result to apply it</li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <div class="panel">
+                <div class="panel-title">
+                    <span>Input</span>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Enter your text:</label>
+                    <textarea id="inputText" placeholder="Enter text to encrypt or decrypt...">The Caesar cipher is one of the simplest and most widely known encryption techniques.</textarea>
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label">Shift Value:</label>
+                    <div class="shift-controls">
+                        <button id="decreaseShift">-</button>
+                        <div class="shift-value" id="shiftValue">3</div>
+                        <button id="increaseShift">+</button>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button id="encryptBtn" class="btn-primary">Encrypt</button>
+                    <button id="decryptBtn" class="btn-secondary">Decrypt</button>
+                    <button id="autoDecryptBtn">Auto Decrypt</button>
+                    <button id="resetBtn" class="btn-reset">Reset</button>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-title">
+                    <span>Output</span>
+                </div>
+                <div class="control-group">
+                    <label class="control-label">Result:</label>
+                    <textarea id="outputText" placeholder="Result will appear here..." readonly></textarea>
+                </div>
+                
+                <div class="frequency-section">
+                    <label class="control-label">Frequency Analysis:</label>
+                    <div class="frequency-bars" id="frequencyBars">
+                        <!-- Frequency bars will be generated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="panel auto-decrypt">
+                <div class="panel-title">
+                    <span>Auto Decrypt Results</span>
+                </div>
+                <div class="results-container" id="autoDecryptResults">
+                    <!-- Auto-decrypt results will be generated here -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Caesar Cipher Tool | Based on Boxentriq's implementation | All features functional</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const inputText = document.getElementById('inputText');
+            const outputText = document.getElementById('outputText');
+            const shiftValue = document.getElementById('shiftValue');
+            const encryptBtn = document.getElementById('encryptBtn');
+            const decryptBtn = document.getElementById('decryptBtn');
+            const autoDecryptBtn = document.getElementById('autoDecryptBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const increaseShift = document.getElementById('increaseShift');
+            const decreaseShift = document.getElementById('decreaseShift');
+            const frequencyBars = document.getElementById('frequencyBars');
+            const autoDecryptResults = document.getElementById('autoDecryptResults');
+            
+            let currentShift = 3;
+            
+            // Initialize frequency chart
+            createFrequencyBars();
+            
+            // Event Listeners
+            encryptBtn.addEventListener('click', () => processText('encrypt'));
+            decryptBtn.addEventListener('click', () => processText('decrypt'));
+            autoDecryptBtn.addEventListener('click', autoDecrypt);
+            resetBtn.addEventListener('click', reset);
+            increaseShift.addEventListener('click', () => updateShift(1));
+            decreaseShift.addEventListener('click', () => updateShift(-1));
+            
+            // Initialize with sample encryption
+            encryptText();
+            
+            function updateShift(change) {
+                currentShift = (currentShift + change + 26) % 26;
+                if (currentShift === 0) currentShift = 26;
+                shiftValue.textContent = currentShift;
+            }
+            
+            function processText(action) {
+                const text = inputText.value;
+                if (!text.trim()) return;
+                
+                if (action === 'encrypt') {
+                    encryptText();
+                } else {
+                    decryptText();
+                }
+                
+                updateFrequencyChart();
+            }
+            
+            function encryptText() {
+                const text = inputText.value;
+                outputText.value = caesarCipher(text, currentShift);
+            }
+            
+            function decryptText() {
+                const text = inputText.value;
+                outputText.value = caesarCipher(text, 26 - currentShift);
+            }
+            
+            function caesarCipher(text, shift) {
+                return text.replace(/[a-z]/gi, char => {
+                    const code = char.charCodeAt(0);
+                    let base = code >= 65 && code <= 90 ? 65 : 97;
+                    return String.fromCharCode(
+                        ((code - base + shift) % 26 + 26) % 26 + base
+                    );
+                });
+            }
+            
+            function autoDecrypt() {
+                const ciphertext = inputText.value;
+                if (!ciphertext.trim()) return;
+                
+                autoDecryptResults.innerHTML = '';
+                
+                for (let shift = 1; shift < 26; shift++) {
+                    const decryptedText = caesarCipher(ciphertext, shift);
+                    const resultElement = document.createElement('div');
+                    resultElement.className = 'decrypt-result';
+                    resultElement.innerHTML = `
+                        <div class="shift-label">Shift: ${shift}</div>
+                        <div class="decrypted-text">${decryptedText}</div>
+                    `;
+                    
+                    resultElement.addEventListener('click', () => {
+                        document.querySelectorAll('.decrypt-result').forEach(el => {
+                            el.classList.remove('selected');
+                        });
+                        resultElement.classList.add('selected');
+                        outputText.value = decryptedText;
+                        currentShift = (26 - shift) % 26;
+                        if (currentShift === 0) currentShift = 26;
+                        shiftValue.textContent = currentShift;
+                        updateFrequencyChart();
+                    });
+                    
+                    autoDecryptResults.appendChild(resultElement);
+                }
+            }
+            
+            function reset() {
+                inputText.value = 'The Caesar cipher is one of the simplest and most widely known encryption techniques.';
+                outputText.value = '';
+                currentShift = 3;
+                shiftValue.textContent = currentShift;
+                autoDecryptResults.innerHTML = '';
+                encryptText();
+            }
+            
+            function createFrequencyBars() {
+                frequencyBars.innerHTML = '';
+                for (let i = 0; i < 26; i++) {
+                    const bar = document.createElement('div');
+                    bar.className = 'frequency-bar';
+                    
+                    const label = document.createElement('div');
+                    label.className = 'frequency-label';
+                    label.textContent = String.fromCharCode(65 + i);
+                    
+                    bar.appendChild(label);
+                    frequencyBars.appendChild(bar);
+                }
+            }
+            
+            function updateFrequencyChart() {
+                const text = outputText.value.toUpperCase().replace(/[^A-Z]/g, '');
+                const totalLetters = text.length;
+                const frequency = Array(26).fill(0);
+                
+                // Count letter frequency
+                for (let char of text) {
+                    const index = char.charCodeAt(0) - 65;
+                    if (index >= 0 && index < 26) {
+                        frequency[index]++;
+                    }
+                }
+                
+                // Normalize to max frequency for visualization
+                const maxFreq = Math.max(...frequency);
+                const bars = document.querySelectorAll('.frequency-bar');
+                
+                bars.forEach((bar, index) => {
+                    const count = frequency[index];
+                    const percentage = maxFreq ? (count / maxFreq) * 100 : 0;
+                    bar.style.height = `${percentage}%`;
+                    
+                    // Add count tooltip
+                    bar.title = `${String.fromCharCode(65 + index)}: ${count} (${totalLetters ? (count/totalLetters*100).toFixed(1) : 0}%)`;
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+                                 
